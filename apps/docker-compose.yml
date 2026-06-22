@@ -13,7 +13,7 @@ services:
 
   anime-api:
     build:
-      context: ./apps/anime-api
+      context: ./anime-api
     container_name: anime_api
     ports:
       - "5001:5001"
@@ -29,7 +29,7 @@ services:
 
   anime-ui:
     build:
-      context: ./apps/anime-ui
+      context: ./anime-ui
       args:
         - ANIME_API_URL=http://localhost:5001
     container_name: anime_ui
