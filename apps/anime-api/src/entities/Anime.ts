@@ -1,5 +1,4 @@
-import { Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryColumn } from "typeorm";
-import { Episode } from "./Episode";
+import { Column, Entity, JoinTable, ManyToMany, PrimaryColumn } from "typeorm";
 import { Character } from "./Character";
 
 @Entity('animes')
@@ -21,9 +20,6 @@ export class Anime {
 
     @Column({ type: 'text', nullable: true })
     description!: string;
-
-    @OneToMany(() => Episode, (episode) => episode.anime, { cascade: true })
-    episodes!: Episode[];
 
     @ManyToMany(() => Character, (character) => character.animes, { cascade: true })
     @JoinTable()
