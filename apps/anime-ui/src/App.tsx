@@ -133,18 +133,18 @@ export default function App() {
       }
       const data = await res.json();
       const newNodes = data.nodes || [];
-      
+
       const updatedCharacters = [...selectedAnime.characters, ...newNodes];
       const uniqueCharacters = Array.from(new Map(updatedCharacters.map(c => [c.id, c])).values());
-      
+
       const updatedAnime = {
         ...selectedAnime,
         characters: uniqueCharacters
       };
-      
+
       setSelectedAnime(updatedAnime);
       setAnimes(prev => prev.map(a => a.id === selectedAnime.id ? updatedAnime : a));
-      
+
       setCharacterPage(nextPage);
       setHasMoreCharacters(data.hasNextPage && newNodes.length > 0);
     } catch (err) {
@@ -265,27 +265,27 @@ export default function App() {
                 )}
                 <p className="card-description" dangerouslySetInnerHTML={formatDescription(anime.description)}></p>
 
-                  <div className="card-footer">
-                    <div className="avatar-group">
-                      {anime.characters?.slice(0, 4).map(char => (
-                        <div key={char.id} className="avatar-wrapper" title={char.name}>
-                          <img
-                            src={char.image || 'https://via.placeholder.com/150'}
-                            alt={char.name}
-                            className="avatar-img"
-                          />
-                        </div>
-                      ))}
-                      {anime.characters?.length > 4 && (
-                        <div className="avatar-plus">
-                          +{anime.characters.length - 4}
-                        </div>
-                      )}
-                    </div>
-                    <span className="characters-count-tag">
-                      {anime.characters?.length || 0} characters
-                    </span>
+                <div className="card-footer">
+                  <div className="avatar-group">
+                    {anime.characters?.slice(0, 4).map(char => (
+                      <div key={char.id} className="avatar-wrapper" title={char.name}>
+                        <img
+                          src={char.image || 'https://via.placeholder.com/150'}
+                          alt={char.name}
+                          className="avatar-img"
+                        />
+                      </div>
+                    ))}
+                    {anime.characters?.length > 4 && (
+                      <div className="avatar-plus">
+                        +{anime.characters.length - 4}
+                      </div>
+                    )}
                   </div>
+                  <span className="characters-count-tag">
+                    {anime.characters?.length || 0} characters
+                  </span>
+                </div>
               </article>
             ))}
           </div>
