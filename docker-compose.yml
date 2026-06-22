@@ -1,0 +1,42 @@
+services:
+  postgres-db:
+    image: postgres:15-alpine
+    container_name: local_postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: psswd
+      POSTGRES_DB: anime_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  anime-api:
+    build:
+      context: ./apps/anime-api
+    container_name: anime_api
+    ports:
+      - "5001:5001"
+    environment:
+      - DB_HOST=postgres-db
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=psswd
+      - DB_NAME=anime_db
+      - PORT=5001
+    depends_on:
+      - postgres-db
+
+  anime-ui:
+    build:
+      context: ./apps/anime-ui
+      args:
+        - ANIME_API_URL=http://localhost:5001
+    container_name: anime_ui
+    ports:
+      - "5002:5002"
+    depends_on:
+      - anime-api
+
+volumes:
+  pgdata:
