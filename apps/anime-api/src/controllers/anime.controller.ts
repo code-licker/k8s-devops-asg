@@ -3,6 +3,15 @@ import { AnimeService } from '../services/anime.service';
 
 const animeService = new AnimeService();
 
+export const getAllAnime = async (_req: Request, res: Response): Promise<void> => {
+  try {
+    const animes = await animeService.getAllAnime();
+    res.status(200).json(animes);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 export const getAnime = async (req: Request, res: Response): Promise<void> => {
   try {
     const id = parseInt(req.params['id'] as string);

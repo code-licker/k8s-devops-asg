@@ -7,6 +7,12 @@ export class AnimeService {
     private animeRepository = AppDataSource.getRepository(Anime);
     private ANILIST_URL = 'https://graphql.anilist.co'
 
+    async getAllAnime(): Promise<Anime[]> {
+        return await this.animeRepository.find({
+            relations: { characters: true }
+        });
+    }
+
     async getAnimeById(id: number): Promise<Anime | null> {
 
         const cachedAnime = await this.animeRepository.findOne({
