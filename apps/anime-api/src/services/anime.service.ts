@@ -103,4 +103,94 @@ export class AnimeService {
             throw new Error('Failed to retrieve anime data.');
         }
     }
+
+    async getAnimeCharacters(id: number, page: number): Promise<{ nodes: any[], hasNextPage: boolean }> {
+        const query = `
+            query ($id: Int, $page: Int) {
+                Media (id: $id, type: ANIME) {
+                    characters (page: $page, perPage: 10) {
+                        pageInfo {
+                            hasNextPage
+                        }
+                        nodes {
+                            id
+                            name {
+                                full
+                            }
+                            image {
+                                medium
+                            }
+                        }
+                    }
+                }
+            }
+        `;
+
+        try {
+            const resAniList = await axios.post(
+                this.ANILIST_URL, 
+                {
+                    query,
+                    variables: { id, page }
+                },
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                    }
+                }
+            );
+
+            const media = resAniList.data?.data?.Media;
+            if (!media || !media.characters) {
+                return { nodes: [], hasNextPage: false };
+            }
+
+            const charactersData = media.characters;
+            const nodes = charactersData.nodes || [];
+            const hasNextPage = charactersData.pageInfo?.hasNextPage || false;
+
+            // Cache characters in local DB and associate with the anime
+            const anime = await this.animeRepository.findOne({
+                where: { id: id },
+                relations: { characters: true }
+            });
+
+            if (anime) {
+                const newChars: Character[] = [];
+                const characterRepository = AppDataSource.getRepository(Character);
+
+                for (const node of nodes) {
+                    let char = await characterRepository.findOne({ where: { id: node.id } });
+                    if (!char) {
+                        char = new Character();
+                        char.id = node.id;
+                        char.name = node.name.full;
+                        char.image = node.image.medium;
+                        await characterRepository.save(char);
+                    }
+                    newChars.push(char);
+                }
+
+                const existingIds = new Set(anime.characters.map(c => c.id));
+                const charsToAppend = newChars.filter(c => !existingIds.has(c.id));
+                if (charsToAppend.length > 0) {
+                    anime.characters = [...anime.characters, ...charsToAppend];
+                    await this.animeRepository.save(anime);
+                }
+            }
+
+            return {
+                nodes: nodes.map((node: any) => ({
+                    id: node.id,
+                    name: node.name.full,
+                    image: node.image.medium
+                })),
+                hasNextPage
+            };
+        } catch (error: any) {
+            console.error('❌ Failed to fetch page characters from AniList API:', error.message || error);
+            throw new Error('Failed to retrieve characters.');
+        }
+    }
 }
