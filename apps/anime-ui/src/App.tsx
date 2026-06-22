@@ -1,5 +1,6 @@
 import { useState, useEffect, type FormEvent } from 'react';
 import './App.css';
+import sampleAnimeList from './sample-anime.json';
 
 // TypeScript Interfaces matching the backend entities
 interface Character {
@@ -39,10 +40,71 @@ export default function App() {
     type: null
   });
 
-  // Fetch cached list on component mount
+  // Modal and HPA states
+  const [showSampleModal, setShowSampleModal] = useState<boolean>(false);
+  const [sampleSearchQuery, setSampleSearchQuery] = useState<string>('');
+  const [hpaLoadActive, setHpaLoadActive] = useState<boolean>(false);
+  const [hpaLoading, setHpaLoading] = useState<boolean>(false);
+
+  // Fetch cached list and HPA status on component mount
   useEffect(() => {
     fetchCachedAnime();
+    fetchHpaStatus();
   }, []);
+
+  const fetchHpaStatus = async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/load`);
+      if (res.ok) {
+        const data = await res.json();
+        setHpaLoadActive(data.active);
+      }
+    } catch (err) {
+      console.error('Failed to fetch HPA status:', err);
+    }
+  };
+
+  const handleToggleHpaLoad = async () => {
+    setHpaLoading(true);
+    const nextState = !hpaLoadActive;
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/load`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ active: nextState })
+      });
+      if (!res.ok) {
+        throw new Error('Failed to toggle HPA load simulation.');
+      }
+      const data = await res.json();
+      setHpaLoadActive(data.active);
+      showStatus(
+        data.active
+          ? '🔥 HPA CPU Load Simulation activated! Backend container is under heavy load simulation.'
+          : '❄️ HPA CPU Load Simulation stopped.',
+        'success'
+      );
+    } catch (err: any) {
+      console.error(err);
+      showStatus(err.message || 'Error communicating with HPA service.', 'error');
+    } finally {
+      setHpaLoading(false);
+    }
+  };
+
+  // Filter sample anime list based on query
+  const filteredSamples = sampleAnimeList
+    .filter(sample => {
+      const query = sampleSearchQuery.trim().toLowerCase();
+      if (!query) return true;
+      return (
+        sample.id.toString().includes(query) ||
+        sample.name.toLowerCase().includes(query)
+      );
+    })
+    .slice(0, 100);
 
   const fetchCachedAnime = async () => {
     try {
@@ -163,10 +225,30 @@ export default function App() {
     <div className="app-container">
       {/* Header */}
       <header className="app-header">
-        <h1>AniCache Hub</h1>
-        <p className="subtitle">
-          Query the global AniList database by ID. The application fetches, stores, and serves the details from a local persistent database.
-        </p>
+        <div className="header-main-row">
+          <div>
+            <h1>AniCache Hub</h1>
+            <p className="subtitle">
+              Query the global AniList database by ID. The application fetches, stores, and serves the details from a local persistent database.
+            </p>
+          </div>
+          <div className="header-actions">
+            <button
+              id="hpa-load-toggle-btn"
+              type="button"
+              onClick={handleToggleHpaLoad}
+              disabled={hpaLoading}
+              className={`hpa-toggle-btn ${hpaLoadActive ? 'load-active' : ''}`}
+            >
+              {hpaLoading ? (
+                <div className="loader-spin" style={{ borderColor: 'rgba(255, 255, 255, 0.4)', borderTopColor: '#ffffff' }}></div>
+              ) : (
+                <span className="hpa-pulse-dot"></span>
+              )}
+              {hpaLoadActive ? 'HPA Test: Decrease Load' : 'HPA Test: Increase Load'}
+            </button>
+          </div>
+        </div>
       </header>
 
       {/* Search Console */}
@@ -194,6 +276,14 @@ export default function App() {
               className="btn-fetch"
             >
               {loading ? <div className="loader-spin"></div> : 'Fetch & Cache'}
+            </button>
+            <button
+              id="browse-samples-btn"
+              type="button"
+              onClick={() => setShowSampleModal(true)}
+              className="btn-browse-samples"
+            >
+              🔍 Browse Sample IDs
             </button>
           </form>
 
@@ -387,6 +477,111 @@ export default function App() {
                   <p>No characters cached for this anime.</p>
                 )}
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Sample IDs Modal */}
+      {showSampleModal && (
+        <div
+          className="modal-backdrop"
+          id="sample-ids-modal-backdrop"
+          onClick={() => {
+            setShowSampleModal(false);
+            setSampleSearchQuery('');
+          }}
+        >
+          <div
+            className="modal-content sample-modal-content"
+            id="sample-ids-modal-content"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              id="sample-modal-close-btn"
+              type="button"
+              onClick={() => {
+                setShowSampleModal(false);
+                setSampleSearchQuery('');
+              }}
+              className="modal-close-btn"
+              title="Close panel"
+            >
+              ✕
+            </button>
+
+            {/* Modal Header */}
+            <div className="modal-header-simple">
+              <h2 className="modal-title-english">Browse Sample Anime IDs</h2>
+              <p className="modal-title-romaji">
+                Choose a sample anime from the local configuration to populate the search bar.
+              </p>
+            </div>
+
+            {/* Modal Search Filter */}
+            <div className="sample-modal-search-wrapper">
+              <input
+                id="sample-search-input"
+                type="text"
+                placeholder="Filter samples by title or ID..."
+                value={sampleSearchQuery}
+                onChange={(e) => setSampleSearchQuery(e.target.value)}
+                className="sample-search-input"
+                autoFocus
+              />
+            </div>
+
+            {/* Modal Table Body */}
+            <div className="modal-body sample-modal-body">
+              <div className="table-container">
+                <table className="sample-table">
+                  <thead>
+                    <tr>
+                      <th>AniList ID</th>
+                      <th>Anime Name</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredSamples.map((sample) => (
+                      <tr
+                        key={sample.id}
+                        onClick={() => {
+                          setSearchId(sample.id.toString());
+                          setShowSampleModal(false);
+                          setSampleSearchQuery('');
+                        }}
+                        className="sample-table-row"
+                      >
+                        <td>
+                          <span className="sample-id-badge">{sample.id}</span>
+                        </td>
+                        <td className="sample-name-cell">{sample.name}</td>
+                        <td>
+                          <button
+                            type="button"
+                            className="btn-select-sample"
+                          >
+                            Select
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                    {filteredSamples.length === 0 && (
+                      <tr>
+                        <td colSpan={3} className="no-samples-found">
+                          No matching samples found.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            
+            {/* Modal Footer */}
+            <div className="sample-modal-footer">
+              Showing {filteredSamples.length} of {sampleAnimeList.length} samples (Limited to top 100)
             </div>
           </div>
         </div>
