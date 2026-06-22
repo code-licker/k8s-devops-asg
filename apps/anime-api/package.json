@@ -1,0 +1,45 @@
+{
+  "name": "anime-api",
+  "version": "1.0.0",
+  "description": "API to get anime, characters, etc from AniList and keep them in a DB",
+  "homepage": "https://github.com/code-licker/k8s-devops-asg#readme",
+  "bugs": {
+    "url": "https://github.com/code-licker/k8s-devops-asg/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/code-licker/k8s-devops-asg.git"
+  },
+  "license": "ISC",
+  "author": "Fati Hui Kitaab",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix"
+  },
+  "dependencies": {
+    "axios": "^1.18.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "pg": "^8.22.0",
+    "reflect-metadata": "^0.2.2",
+    "typeorm": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.61.1",
+    "@typescript-eslint/parser": "^8.61.1",
+    "eslint": "^10.5.0",
+    "nodemon": "^3.1.14",
+    "ts-node": "^10.9.2",
+    "typescript": "^6.0.3"
+  }
+}
