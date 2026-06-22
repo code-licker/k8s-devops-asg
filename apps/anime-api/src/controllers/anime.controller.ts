@@ -70,7 +70,7 @@ export const toggleLoad = async (req: Request, res: Response): Promise<void> => 
     res.status(400).json({ error: 'Field "active" must be a boolean' });
     return;
   }
-  
+
   if (active && !loadActive) {
     loadActive = true;
     console.log('⚡ Starting HPA test CPU load simulation...');
@@ -83,7 +83,7 @@ export const toggleLoad = async (req: Request, res: Response): Promise<void> => 
     }
     console.log('💤 Stopping HPA test CPU load simulation.');
   }
-  
+
   res.status(200).json({ active: loadActive });
 };
 
@@ -103,5 +103,5 @@ export const getHealth = async (_req: Request, res: Response): Promise<void> => 
 };
 
 export const getVersion = async (_req: Request, res: Response): Promise<void> => {
-  res.status(200).json({ version: '1.0.0' });
+  res.status(200).json({ version: '2.0.0' });
 };
