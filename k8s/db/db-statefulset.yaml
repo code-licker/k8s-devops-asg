@@ -13,11 +13,9 @@ spec:
       labels:
         app: postgres-custom-db
     spec:
-      imagePullSecrets:
-        - name: acr-registry-secret
       containers:
         - name: postgres
-          image: nagp2026rbx.azurecr.io/nagp-2026-anime-db:1.0.0
+          image: ghcr.io/code-licker/nagp-2026-anime-db:1.0.0
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 5432
