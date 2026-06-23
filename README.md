@@ -16,6 +16,7 @@ This repository contains a 3-tier web application (React UI, Node.js API, and Po
   - [Kubernetes Manifests (k8s)](#kubernetes-manifests-k8s)
 - [How to Deploy on AKS](#how-to-deploy-on-aks)
 - [Sample API Calls](#sample-api-calls)
+- [Querying the Database](#querying-the-database)
 
 ---
 
@@ -155,4 +156,50 @@ Since requests are load-balanced across multiple replica pods, use a simple para
 * **Version Check**:
   ```bash
   curl http://135.235.144.73/api/version
+  ```
+
+---
+
+## Querying the Database
+
+You can inspect the PostgreSQL database inside the cluster in two ways:
+
+### 1. Directly inside the Pod (Interactive psql)
+Connect to the running container using `kubectl exec`:
+```bash
+kubectl exec -it anime-db-statefulset-0 -- psql -U postgres -d anime_db
+```
+*(Enter password `psswd` when prompted).*
+
+### 2. Forwarding Port Locally (For GUI Clients like DBeaver)
+Tunnel port 5432 to your machine:
+```bash
+kubectl port-forward service/anime-db-service 5432:5432
+```
+Then connect using:
+* **Host**: `localhost`
+* **Port**: `5432`
+* **User**: `postgres`
+* **Password**: `psswd`
+* **Database**: `anime_db`
+
+### 3. Sample SQL Queries
+Once connected, you can run these queries:
+> Make sure you add the semicolon. I spent 5-10 minutes figuring out why the queries were not working in `exec` command.
+
+* **Check cached anime count**:
+  ```sql
+  SELECT COUNT(*) FROM anime;
+  ```
+* **Show the 5 most recently cached anime**:
+  ```sql
+  SELECT id, "titleEnglish", "titleRomaji" FROM anime ORDER BY id DESC LIMIT 5;
+  ```
+* **Find characters cached for a specific anime ID** (e.g., ID 21):
+  ```sql
+  SELECT id, name FROM character WHERE "animeId" = 21;
+  ```
+* **Quit psql shell**:
+  ```sql
+  \q
   ```
