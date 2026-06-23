@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: postgres-custom-service
+  name: anime-db-service
 spec:
   type: ClusterIP
   ports:
     - port: 5432
       targetPort: 5432
   selector:
-    app: postgres-custom-db
+    app: anime-db-custom-postgres

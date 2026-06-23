@@ -1,23 +1,21 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: postgres-custom
+  name: anime-db-statefulset
 spec:
-  serviceName: "postgres-custom-service"
+  serviceName: "anime-db-service"
   replicas: 1
   selector:
     matchLabels:
-      app: postgres-custom-db
+      app: anime-db-custom-postgres
   template:
     metadata:
       labels:
-        app: postgres-custom-db
+        app: anime-db-custom-postgres
     spec:
-      imagePullSecrets:
-        - name: acr-registry-secret
       containers:
         - name: postgres
-          image: nagp2026rbx.azurecr.io/nagp-2026-anime-db:1.0.0
+          image: ghcr.io/code-licker/nagp-2026-anime-db:1.0.0
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 5432
@@ -26,24 +24,24 @@ spec:
             - name: POSTGRES_USER
               valueFrom:
                 secretKeyRef:
-                  name: postgres-db-secrets
+                  name: anime-db-secrets
                   key: POSTGRES_USER
             - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: postgres-db-secrets
+                  name: anime-db-secrets
                   key: POSTGRES_PASSWORD
             - name: POSTGRES_DB
               valueFrom:
                 secretKeyRef:
-                  name: postgres-db-secrets
+                  name: anime-db-secrets
                   key: POSTGRES_DB
             - name: PGDATA
               value: /var/lib/postgresql/data/pgdata
           volumeMounts:
-            - name: postgres-data-volume
+            - name: anime-db-data-volume
               mountPath: /var/lib/postgresql/data 
       volumes:
-        - name: postgres-data-volume
+        - name: anime-db-data-volume
           persistentVolumeClaim:
-            claimName: postgres-custom-pvc 
+            claimName: anime-db-pvc 
