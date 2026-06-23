@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: anime-ui-deployment
+  labels:
+    app: anime-ui
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: anime-ui
+  template:
+    metadata:
+      labels:
+        app: anime-ui
+    spec:
+      containers:
+        - name: anime-ui
+          image: ghcr.io/code-licker/nagp-2026-anime-ui:1.0.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5002
+              name: ui
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "64Mi"
+            limits:
+              cpu: "100m"
+              memory: "128Mi"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 5002
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 5002
+            initialDelaySeconds: 5
+            periodSeconds: 5

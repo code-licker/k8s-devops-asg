@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: anime-api-configmap
+data:
+  DB_HOST: "anime-db-service"
+  DB_PORT: "5432"
+  DB_USER: "postgres"
+  DB_NAME: "anime_db"
+  PORT: "5001"

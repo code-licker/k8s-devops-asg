@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: anime-app-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  ingressClassName: nginx
+  rules:
+    - http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: anime-api-service
+                port:
+                  number: 5001
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: anime-ui-service
+                port:
+                  number: 5002
