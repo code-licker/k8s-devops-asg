@@ -32,5 +32,7 @@ kubectl apply -f ./ui/ui-service.yaml
 
 # setup ingress routing
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/cloud/deploy.yaml
+
+# run this after all pods are running successfully
 kubectl apply -f ./ingress.yaml
 ```

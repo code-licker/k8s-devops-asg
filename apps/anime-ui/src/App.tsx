@@ -68,22 +68,28 @@ export default function App() {
     setHpaLoading(true);
     const nextState = !hpaLoadActive;
     try {
-      const res = await fetch(`${API_BASE_URL}/api/load`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ active: nextState })
-      });
-      if (!res.ok) {
-        throw new Error('Failed to toggle HPA load simulation.');
+      // Send multiple requests in parallel to distribute the state change to all API pods
+      const requests = Array.from({ length: 15 }).map(() =>
+        fetch(`${API_BASE_URL}/api/load`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ active: nextState })
+        })
+      );
+      
+      const responses = await Promise.all(requests);
+      const failed = responses.filter(r => !r.ok);
+      if (failed.length === responses.length) {
+        throw new Error('Failed to toggle HPA load simulation on replicas.');
       }
-      const data = await res.json();
-      setHpaLoadActive(data.active);
+      
+      setHpaLoadActive(nextState);
       showStatus(
-        data.active
-          ? '🔥 HPA CPU Load Simulation activated! Backend container is under heavy load simulation.'
-          : '❄️ HPA CPU Load Simulation stopped.',
+        nextState
+          ? '🔥 HPA CPU Load Simulation activated across all API replicas!'
+          : '❄️ HPA CPU Load Simulation stopped across all API replicas.',
         'success'
       );
     } catch (err: any) {

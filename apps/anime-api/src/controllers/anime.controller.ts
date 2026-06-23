@@ -54,10 +54,10 @@ let loadTimer: NodeJS.Timeout | null = null;
 function generateCPULoad() {
   if (!loadActive) return;
   const startTime = Date.now();
-  while (Date.now() - startTime < 50) {
+  while (Date.now() - startTime < 100) {
     Math.random() * Math.random();
   }
-  loadTimer = setTimeout(generateCPULoad, 5);
+  loadTimer = setTimeout(generateCPULoad, 1);
 }
 
 export const getLoadStatus = async (_req: Request, res: Response): Promise<void> => {
@@ -103,5 +103,5 @@ export const getHealth = async (_req: Request, res: Response): Promise<void> => 
 };
 
 export const getVersion = async (_req: Request, res: Response): Promise<void> => {
-  res.status(200).json({ version: '2.0.0' });
+  res.status(200).json({ version: '1.0.0' });
 };
