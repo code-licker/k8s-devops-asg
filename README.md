@@ -1,5 +1,10 @@
 # DevOps Kubernetes Assignment (AniCache Hub)
 
+- Read the full assignment details [here](problem-statement.md)
+- Read the app description and how to run them locally at [apps/README.md](apps/README.md) 
+
+## High Level Summary of my approach
+
 This repository contains a 3-tier web application (React UI, Node.js API, and Postgres DB) and the Kubernetes manifests to deploy it to Azure Kubernetes Service (AKS).
 
 ## Table of Contents
