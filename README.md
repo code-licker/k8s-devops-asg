@@ -9,14 +9,15 @@ This repository contains a 3-tier web application (React UI, Node.js API, and Po
 
 ## Table of Contents
 - [How the App Works](#how-the-app-works)
-- [AKS Setup](#aks-setup)
+- [AKS/GKE Setup](#aks-gke-setup)
 - [Docker Images](#docker-images)
 - [Project Structure & Paths](#project-structure--paths)
   - [Source Code](#source-code)
   - [Kubernetes Manifests (k8s)](#kubernetes-manifests-k8s)
-- [How to Deploy on AKS](#how-to-deploy-on-aks)
+- [How to Deploy on AKS/GKE](#how-to-deploy-on-aks-gke)
 - [Sample API Calls](#sample-api-calls)
 - [Querying the Database](#querying-the-database)
+- [Deliverables](#deliverables)
 
 ---
 
@@ -31,9 +32,9 @@ The app is called **AniCache Hub**. It fetches and displays details of different
 
 ---
 
-## AKS Setup
+## AKS-GKE Setup
 
-The app runs on **Azure Kubernetes Service (AKS)** behind an Nginx Ingress Controller. 
+The app runs on **Azure Kubernetes Service (AKS)** or **Google Kubernetes Engine (GKE)** behind an Nginx Ingress Controller. 
 The Ingress controller routes traffic:
 * `/api` routes to the backend service.
 * `/` routes to the frontend React UI.
@@ -54,35 +55,35 @@ The container images are hosted on **GitHub Container Registry (GHCR)**:
 ## Project Structure & Paths
 
 ### Source Code
-* **Postgres Setup**: [apps/anime-db](file:///home/rohanb/code/k8s-nagp-devops-asg/apps/anime-db)
-* **Node.js Express API**: [apps/anime-api](file:///home/rohanb/code/k8s-nagp-devops-asg/apps/anime-api)
-* **React Web UI**: [apps/anime-ui](file:///home/rohanb/code/k8s-nagp-devops-asg/apps/anime-ui)
+* **Postgres Setup**: [apps/anime-db](./apps/anime-db)
+* **Node.js Express API**: [apps/anime-api](./apps/anime-api)
+* **React Web UI**: [apps/anime-ui](./apps/anime-ui)
 
 ### Kubernetes Manifests (k8s)
-The files are organized inside the [k8s](file:///home/rohanb/code/k8s-nagp-devops-asg/k8s) directory:
+The files are organized inside the [k8s](./k8s) directory:
 
 #### 1. Database Tier (`k8s/db/`)
-* [db-postgres-secret.yaml](file:///home/rohanb/code/k8s-nagp-devops-asg/k8s/db/db-postgres-secret.yaml) - Secrets containing database user credentials and password.
-* [db-pvc.yaml](file:///home/rohanb/code/k8s-nagp-devops-asg/k8s/db/db-pvc.yaml) - Request for a 1Gi persistent volume.
-* [db-statefulset.yaml](file:///home/rohanb/code/k8s-nagp-devops-asg/k8s/db/db-statefulset.yaml) - StatefulSet (1 replica) pulling the pre-seeded DB image and mounting the persistent disk.
-* [db-service.yaml](file:///home/rohanb/code/k8s-nagp-devops-asg/k8s/db/db-service.yaml) - ClusterIP service exposing the database internally on port 5432.
+* [db-postgres-secret.yaml](./k8s/db/db-postgres-secret.yaml) - Secrets containing database user credentials and password.
+* [db-pvc.yaml](./k8s/db/db-pvc.yaml) - Request for a 5Gi persistent volume.
+* [db-statefulset.yaml](./k8s/db/db-statefulset.yaml) - StatefulSet (1 replica) pulling the pre-seeded DB image and mounting the persistent disk.
+* [db-service.yaml](./k8s/db/db-service.yaml) - ClusterIP service exposing the database internally on port 5432.
 
 #### 2. Backend API Tier (`k8s/api/`)
-* [api-configmap.yaml](file:///home/rohanb/code/k8s-nagp-devops-asg/k8s/api/api-configmap.yaml) - Env variables like database hostname, port, and API port.
-* [api-deployment.yaml](file:///home/rohanb/code/k8s-nagp-devops-asg/k8s/api/api-deployment.yaml) - Deployment (4 replicas) with rolling update strategy, CPU/memory limits, and liveness/readiness probes.
-* [api-service.yaml](file:///home/rohanb/code/k8s-nagp-devops-asg/k8s/api/api-service.yaml) - Service exposing the API internally on port 5001.
-* [api-hpa.yaml](file:///home/rohanb/code/k8s-nagp-devops-asg/k8s/api/api-hpa.yaml) - Auto-scaler to scale the API between 4 to 10 pods when CPU usage passes 60%.
+* [api-configmap.yaml](./k8s/api/api-configmap.yaml) - Env variables like database hostname, port, and API port.
+* [api-deployment.yaml](./k8s/api/api-deployment.yaml) - Deployment (4 replicas) with rolling update strategy, CPU/memory limits, and liveness/readiness probes.
+* [api-service.yaml](./k8s/api/api-service.yaml) - Service exposing the API internally on port 5001.
+* [api-hpa.yaml](./k8s/api/api-hpa.yaml) - Auto-scaler to scale the API between 4 to 10 pods when CPU usage passes 60%.
 
 #### 3. Frontend UI Tier (`k8s/ui/`)
-* [ui-deployment.yaml](file:///home/rohanb/code/k8s-nagp-devops-asg/k8s/ui/ui-deployment.yaml) - Deployment (2 replicas) serving the React UI.
-* [ui-service.yaml](file:///home/rohanb/code/k8s-nagp-devops-asg/k8s/ui/ui-service.yaml) - Service exposing the UI internally on port 5002.
+* [ui-deployment.yaml](./k8s/ui/ui-deployment.yaml) - Deployment (2 replicas) serving the React UI.
+* [ui-service.yaml](./k8s/ui/ui-service.yaml) - Service exposing the UI internally on port 5002.
 
 #### 4. Cluster Ingress
-* [ingress.yaml](file:///home/rohanb/code/k8s-nagp-devops-asg/k8s/ingress.yaml) - Ingress rule using the `nginx` class to direct traffic to the UI (`/`) and API (`/api`).
+* [ingress.yaml](./k8s/ingress.yaml) - Ingress rule using the `nginx` class to direct traffic to the UI (`/`) and API (`/api`).
 
 ---
 
-## How to Deploy on AKS
+## How to Deploy on AKS-GKE
 
 Copy and run these commands in order to deploy the application:
 
@@ -203,3 +204,6 @@ Once connected, you can run these queries:
   ```sql
   \q
   ```
+
+## Deliverables
+Please check [deliverables/README.md](deliverables/README.md) for all the deliverables.

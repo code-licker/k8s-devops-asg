@@ -58,9 +58,24 @@ separation).
 
 ---
 
-## Expected Outcome
-The final solution should demonstrate a complete Kubernetes deployment where:
-- the API is reachable from outside the cluster,
-- the database is private and persistent,
-- configuration is externalized securely, and
-- the application is scalable and operationally reliable.
+## Deliverables
+
+* Source Code for the project. Provide repository URL, don't upload whole source code.
+  * Make sure it includes all Kubernetes YAML files used in the assignment.
+  * Dockerfile should be present as well.
+  * Repository can be GitHub or Gitlab. **DO NOT use your project source code.**
+* Also include a README file in code which has:
+  * Link for the code repository.
+  * Docker hub URL for docker images.
+  * URL for Service API tier to view the records from backend tier.
+  * Screen recording video showing all the objects deployed in Kubernetes cluster:
+    * Show all objects deployed and running.
+    * Show an API call retrieving records from database.
+    * Kill API microservice pod and show it regenerates.
+    * Kill database pod and show it regenerates and keeps old data.
+    * Demonstration of deployments, self-healing, persistence, deployment strategy, and FinOps considerations.
+* Prepare a comprehensive documentation that includes the following sections:
+  * Requirement Understanding
+  * Assumptions
+  * Solution Overview
+  * Justification for the Resources Utilized
