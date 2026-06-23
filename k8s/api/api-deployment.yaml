@@ -59,11 +59,11 @@ spec:
                   key: POSTGRES_PASSWORD
           resources:
             requests:
-              cpu: "100m"
-              memory: "128Mi"
+              cpu: "50m"
+              memory: "64Mi"
             limits:
               cpu: "200m"
-              memory: "256Mi"
+              memory: "128Mi"
           livenessProbe:
             httpGet:
               path: /health
