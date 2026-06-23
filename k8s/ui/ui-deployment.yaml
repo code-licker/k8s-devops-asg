@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: anime-ui
-          image: ghcr.io/code-licker/nagp-2026-anime-ui:1.0.0
+          image: ghcr.io/code-licker/nagp-2026-anime-ui:2.0.0
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 5002
