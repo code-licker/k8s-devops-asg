@@ -48,7 +48,7 @@
     * **UI**: Request `50m` CPU / `64Mi` RAM. Limit `100m` CPU / `128Mi` RAM. (Nginx serving static files runs on minimal overhead and nginx is FOSS).
     * **DB PVC**: 5Gi Storage. (Sufficient volume space to hold database catalog files and PostgresSQL is FOSS).
 
-* FinOps Requirements
+## FinOps Requirements
   * Define CPU and memory requests and limits for the service/API tier.
     * API: `CPU: 50m`, `Memory: 64Mi` (Request), `CPU: 200m`, `Memory: 128Mi` (Limit)
     * UI: `CPU: 50m`, `Memory: 64Mi` (Request), `CPU: 100m`, `Memory: 128Mi` (Limit)
